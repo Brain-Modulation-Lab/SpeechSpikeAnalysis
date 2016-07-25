@@ -1,4 +1,5 @@
 %Compare the responses of two sets of trials
+
 colorlist = {[.3 .6 1], [1 0 0], [0 .8 0], [0 0 0],}; 
 
 stimMat = L{wl};
@@ -9,6 +10,12 @@ consType = cellfun(@min, consType);
 trialFeature = consType;
 features = unique(consType);
 groups = {[1 3], [4 5]};
+% grouping by 2nd consonant type, lips v tongue
+% consType = stimMat(:,5);
+% consType = cellfun(@min, consType);
+% trialFeature = consType;
+% features = unique(consType);
+% groups = {[1 3], [4 5]};
 %grouping by early v late consonant
 early = cell2mat(cellfun(@(x) ~isempty(x), stimMat(:,3), 'UniformOutput', false));
 late = ~early;
@@ -49,10 +56,13 @@ for ll = 1:length(groups) %loop through groups, plot them separately
     dataRange(ll,:) = [(kk-nGroupTrials(ll)), (kk-1)];
     meanfunc = @(x)nanmean(x,1);
     semfunc = @(x) nanstd(x,0,1);
-    [ifrCI, bootstat] = bootci(2000, {meanfunc, ifrm(dataRange(ll,1):dataRange(ll,2),:)}, 'type', 'cper','Options', statset('UseParallel',true));
-    
+    [ifrCI, bootstat] = bootci(1000, {meanfunc, ifrm(dataRange(ll,1):dataRange(ll,2),:)}, 'type', 'cper','Options', statset('UseParallel',true));
+    %the SEM of the bootstrapped mean is the Standard Dev of the resampled means (Kass, Eden, Brown 2014; Ch 9)
+    ifrsem = nanstd(bootstat,0,1); 
     plott = respWind./unit.spkSampRate;
-    plotRastersandIFRs(plott, meanh, meanifr, ifrCI(2,:)-meanifr, rasterh, spkm((kk-nGroupTrials(ll)):sum(nGroupTrials), :), kk-nGroupTrials(ll), colorlist{ll});
+    plotRastersandIFRs(plott, meanh, meanifr, ifrsem, rasterh, spkm((kk-nGroupTrials(ll)):sum(nGroupTrials), :), kk-nGroupTrials(ll), colorlist{ll});
+    %plotRastersandIFRs(plott, meanh, meanifr, ifrCI(2,:)-meanifr, rasterh, spkm((kk-nGroupTrials(ll)):sum(nGroupTrials), :), kk-nGroupTrials(ll), colorlist{ll});
+    clusterPermuteTtest(
 end
 % Annotate the plot
 rasterh.XLim = [plott(1) plott(end)];
@@ -66,4 +76,4 @@ plot(meanh, [0 0], meanh.YLim, 'Color', [.7 .7 .7], 'LineWidth', 2);
 
 h = bootstrapMeanTest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1):dataRange(2,2),:), .01);
 sig = h*(meanh.YLim(2)-1); sig(sig==0)=NaN;
-plot(meanh, plott, sig, 'k', 'LineWidth', 2);
+plot(meanh, plott, sig, 'k', 'LineWidth', 3);

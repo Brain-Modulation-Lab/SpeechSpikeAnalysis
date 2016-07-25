@@ -1,4 +1,5 @@
 %Compare the responses of two sets of trials
+
 colorlist = {[.3 .6 1], [1 0 0], [0 .8 0], [0 0 0],}; 
 
 stimMat = L{wl};
@@ -10,17 +11,17 @@ trialFeature = consType;
 features = unique(consType);
 groups = {[1 3], [4 5]};
 % grouping by 2nd consonant type, lips v tongue
-consType = stimMat(:,5);
-consType = cellfun(@min, consType);
-trialFeature = consType;
-features = unique(consType);
-groups = {[1 3], [4 5]};
+% consType = stimMat(:,5);
+% consType = cellfun(@min, consType);
+% trialFeature = consType;
+% features = unique(consType);
+% groups = {[1 3], [4 5]};
 %grouping by early v late consonant
 early = cell2mat(cellfun(@(x) ~isempty(x), stimMat(:,3), 'UniformOutput', false));
 late = ~early;
-trialFeature = late;
-features = [0 1];
-groups = {0, 1}
+% trialFeature = late;
+% features = [0 1];
+% groups = {0, 1}
 kk = 1;
 
 [fh, rasterh, meanh, ~, labelh] = makeRasterIFRplot(sprintf('%s,Word List %d,%s electrode,Unit %d', subjectName, wl, electrodeList{trode}, n));
@@ -75,3 +76,5 @@ plot(meanh, [0 0], meanh.YLim, 'Color', [.7 .7 .7], 'LineWidth', 2);
 h = bootstrapMeanTest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1):dataRange(2,2),:), .01);
 sig = h*(meanh.YLim(2)-1); sig(sig==0)=NaN;
 plot(meanh, plott, sig, 'k', 'LineWidth', 3);
+
+clusterPermuteTtest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1):dataRange(2,2),:));
