@@ -9,6 +9,12 @@ consType = cellfun(@min, consType);
 trialFeature = consType;
 features = unique(consType);
 groups = {[1 3], [4 5]};
+% grouping by 2nd consonant type, lips v tongue
+consType = stimMat(:,5);
+consType = cellfun(@min, consType);
+trialFeature = consType;
+features = unique(consType);
+groups = {[1 3], [4 5]};
 %grouping by early v late consonant
 early = cell2mat(cellfun(@(x) ~isempty(x), stimMat(:,3), 'UniformOutput', false));
 late = ~early;
