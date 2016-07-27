@@ -63,10 +63,10 @@ for ii = 1:length(rec_idx)
             %figure; ah = axes();
             fprintf('%s contains %d units.\n', spikeFN, nUnits);
             for n=1:nUnits
-                tags = unitList.(electrodeList{jj}){ii}.units(n);
+                tags = unitList.(electrodeList{jj}){ii}.units{n};
                 ts = [];
                 for tt=1:length(tags)    
-                    ts = cat(1, ts, spikeTimes(spikeTimes(:,1) == tt, 2));
+                    ts = cat(1, ts, spikeTimes(spikeTimes(:,1) == tags(tt), 2));
                 end
                 ts = sort(ts);
                 trialRange = unitList.(electrodeList{jj}){ii}.trials{n};

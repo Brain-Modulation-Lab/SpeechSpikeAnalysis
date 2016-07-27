@@ -12,7 +12,7 @@ D(round(spkTimes.*spkSampRate)) = 1; %binary spike vector
 
 %sets up the gaussian filter for spike density estimation
 %standard  deviation of the gaussian smoothing
-stdg = filtSD; %40 samples is a gaussian with std 40ms
+stdg = filtSD; % this standard deviation is in samples 
 filtx = -4*stdg:1:4*stdg;
 filty = normpdf(filtx,0,stdg);
 filty = filty/sum(filty);
@@ -33,14 +33,14 @@ trialRange = trialRange(1):trialRange(2); %changing to be a vector
 nTrials = trialRange(end) - trialRange(1) + 1;
 for ii = 1:nTrials
     stim = trialRange(ii);
-    eventI = (ii)*nEventsPerTrial + SkipEvents;
+    eventI = stim*nEventsPerTrial + SkipEvents;
     trial(ii).EventInds = EventInds((eventI-3):(eventI+1));
     trial(ii).EventTimes = EventTimes((eventI-3):(eventI+1));
     trialWind = trial(ii).EventInds(1):trial(ii).EventInds(5);
     baseWind = (trial(ii).EventInds(4)-1*spkSampRate):(trial(ii).EventInds(4)); %defines the baseline period
     trial(ii).baselineIFR = nanmean(IFR(baseWind));
     trial(ii).basestdIFR = nanstd(IFR(baseWind));
-    trial(ii).baselineSpkCount(ii) = sum(D(baseWind));
+    trial(ii).baselineSpkCount = sum(D(baseWind));
     trial(ii).baselineCountFR = trial(ii).baselineSpkCount.*(length(baseWind)/spkSampRate);
     trial(ii).IFRZ = (IFR(trialWind)-trial(ii).baselineIFR)./trial(ii).basestdIFR;
     trial(ii).baselineWindow = baseWind;
@@ -60,7 +60,7 @@ end
 % Compute a resampled baseline firing rate statistic that gives z-scored
 % bounds for the firing rate range outside of which a response should be
 % considered as significant. Bounds + mean could be used to z-score trials.
-iter = 100;
+iter = 500;
 allBase = zeros(length(trial(1).baselineWindow), nTrials, iter);
 for ii=1:nTrials
     allBase(:,ii,1) = IFR(trial(ii).baselineWindow);
@@ -71,7 +71,7 @@ end
 allBase_mean = squeeze(mean(allBase, 2));
 alpha = .05;
 zBound  = [prctile(allBase_mean(:),alpha/2), prctile(allBase_mean(:),100*(1-alpha/2))];
-zMean = mean(allBase_mean);
+zMean = mean(allBase_mean(:));
 %allBase = [trial.baselineIFR];
 % [f, x] = ecdf(allBase(:));
 % zlowi = find(f < .05, 1, 'last');

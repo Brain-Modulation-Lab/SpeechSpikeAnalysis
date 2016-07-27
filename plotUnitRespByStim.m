@@ -39,11 +39,9 @@ for ll = 1:length(groups) %loop through groups, plot them separately
         groupTrials = groupTrials(:) | featTrials(:);
     end
     
-%     respWind = round(respInterval(1)*unit.spkSampRate):round(respInterval(2)*unit.spkSampRate);
-%     spkm = NaN*zeros(unit.nTrials, length(respWind)); 
-%     ifrm = NaN*zeros(size(ifrzm));
     
     trialList = find(groupTrials);
+    
     for mm=1:nGroupTrials(ll)
         t = trialList(mm);
         audioInd = unit.trial(t).EventInds(4) + round(Rec(rec_idx(wl)).AudioStart{t}/sampRate*unit.spkSampRate);
