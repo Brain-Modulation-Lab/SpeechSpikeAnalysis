@@ -1,8 +1,7 @@
-function unit = UnitResponse(t, spkTimes, vSampRate, spkSampRate, filtSD, EventTimes, SkipEvents, nEventsPerTrial)
+function unit = UnitResponse(t, spkTimes, vSampRate, spkSampRate, filtSD, EventTimes, SkipEvents, nEventsPerTrial, trialRange)
 % function unit = UnitResponse(t, spkTimes, vSampRate, spkSampRate, filtSD, Events, nEventsPerTrial)
 
 dbg = 0;
-spkSampRate = 500;
 down = round(vSampRate/spkSampRate);
 spkSampRate = vSampRate/down;
 tSpk = downsample(t, down);
@@ -13,7 +12,7 @@ D(round(spkTimes.*spkSampRate)) = 1; %binary spike vector
 
 %sets up the gaussian filter for spike density estimation
 %standard  deviation of the gaussian smoothing
-stdg = 20; %40 samples is a gaussian with std 40ms
+stdg = filtSD; %40 samples is a gaussian with std 40ms
 filtx = -4*stdg:1:4*stdg;
 filty = normpdf(filtx,0,stdg);
 filty = filty/sum(filty);
@@ -28,8 +27,12 @@ if dbg
     colors = {'r','b','m','c'};
     figure; hold on;
 end
-nTrials = floor((length(EventTimes) - SkipEvents)./nEventsPerTrial);
+%nTrials = floor((length(EventTimes) - SkipEvents)./nEventsPerTrial);
+unit.trialRange = trialRange;
+trialRange = trialRange(1):trialRange(2); %changing to be a vector
+nTrials = trialRange(end) - trialRange(1) + 1;
 for ii = 1:nTrials
+    stim = trialRange(ii);
     eventI = (ii)*nEventsPerTrial + SkipEvents;
     trial(ii).EventInds = EventInds((eventI-3):(eventI+1));
     trial(ii).EventTimes = EventTimes((eventI-3):(eventI+1));
@@ -41,6 +44,7 @@ for ii = 1:nTrials
     trial(ii).baselineCountFR = trial(ii).baselineSpkCount.*(length(baseWind)/spkSampRate);
     trial(ii).IFRZ = (IFR(trialWind)-trial(ii).baselineIFR)./trial(ii).basestdIFR;
     trial(ii).baselineWindow = baseWind;
+    trial(ii).stim = stim;
     if (sum(D(EventInds((eventI-3):(eventI+1)))) >=1)
         trial(ii).hasSpikes = true;
     else

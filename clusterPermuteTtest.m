@@ -1,6 +1,7 @@
 function [h, p] = clusterPermuteTtest(A, B)
 % function [h, p] = clusterPermuteTtest(data1, data2)
 % data matrices have time along the x, and trial along the y
+plotdistb = 1;
 
 nrep = 1000;
 ntrials = [size(A, 1), size(B,1)];
@@ -33,3 +34,25 @@ for ii=1:nrep
         tsums = cat(1,tsums, ts);
     end
 end
+
+tsums = tsums(tsums ~= 0); %get rid of the zeros in this vector
+sig_thresh = quantile(tsums, [.025 1-.025]);
+hgroup = (groupt <= sig_thresh(1)) | (groupt >= sig_thresh(2)); %above or below permuted significance
+
+for ii=1:length(hgroup)
+   h(clusts == ii) = hgroup(ii);
+   p(clusts == ii) = p(clusts == ii);
+end
+
+if plotdistb && ~isempty(tsums)
+    figure;
+    [f, stepx] = ecdf(tsums);
+    stairs(stepx,f, 'k'); hold on;
+    ah = gca;
+    for ii=1:length(groupt)
+        plot([groupt(ii), groupt(ii)], ah.YLim,'r');
+    end
+end
+
+    
+

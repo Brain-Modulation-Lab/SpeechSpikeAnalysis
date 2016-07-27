@@ -77,4 +77,6 @@ h = bootstrapMeanTest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1)
 sig = h*(meanh.YLim(2)-1); sig(sig==0)=NaN;
 plot(meanh, plott, sig, 'k', 'LineWidth', 3);
 
-clusterPermuteTtest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1):dataRange(2,2),:));
+[h, p] = clusterPermuteTtest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1):dataRange(2,2),:));
+sig = h*(meanh.YLim(2)); sig(sig==0)=NaN;
+plot(meanh, plott, sig, 'b', 'LineWidth', 3);
