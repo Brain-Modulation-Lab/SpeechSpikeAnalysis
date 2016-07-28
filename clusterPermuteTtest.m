@@ -7,7 +7,7 @@ nrep = 1000;
 ntrials = [size(A, 1), size(B,1)];
 %mintrials = min(ntrials);
 
-[h, p, ~, stats] = ttest2(A, B); %operates on each column
+[h, p, ~, stats] = ttest2(A, B, 'alpha', .025); %operates on each column
 clusts = bwlabel(h);
 nclust = length(unique(clusts));
 groupt = [];
@@ -26,7 +26,7 @@ for ii=1:nrep
     bi = order((ntrials(1)+1):nrows);
     B1 = C(bi, :);
     
-    [h1, ~, ~, stat1] = ttest2(A1,B1);
+    [h1, ~, ~, stat1] = ttest2(A1,B1, 'alpha', .025);
     clust1 = bwlabel(h1);
     nclust = length(unique(clust1));
     for jj=1:nclust
