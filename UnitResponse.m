@@ -8,7 +8,9 @@ tSpk = downsample(t, down);
 EventInds = round(EventTimes * spkSampRate);
 
 D = zeros(length(tSpk), 1);
-D(round(spkTimes.*spkSampRate)) = 1; %binary spike vector
+spkinds = round(spkTimes.*spkSampRate);
+spkinds(spkinds < 1) = 1; 
+D(spkinds) = 1; %binary spike vector
 
 %sets up the gaussian filter for spike density estimation
 %standard  deviation of the gaussian smoothing

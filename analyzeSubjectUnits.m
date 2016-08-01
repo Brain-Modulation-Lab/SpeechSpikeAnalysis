@@ -1,6 +1,6 @@
 % Analyze Subject's Units
 subjectInfo;
-%load(recFN);
+load(recFN);
 respInterval = [-2 2.5];
 MerData = struct([]);
 dbg= 1;
@@ -30,12 +30,18 @@ for ii = 1:length(rec_idx)
     end
     
     % What do have/plot the audio signal too
-%     if ii ==1 && exist([dataFN '.ns5'])
-%         [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
-%     elseif ii==1
-%             AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
-%     end
-    Audio = AudioFull(round(tstart*sampRate):round(tend*sampRate));
+    if exist('dataMAT', 'var')
+        if ii==1
+            load(dataMAT{ii});
+        end
+    else
+        if ii ==1 && exist([dataFN '.ns5'])
+            [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
+        elseif ii==1
+            AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
+        end
+        Audio = AudioFull(round(tstart*sampRate):round(tend*sampRate));
+    end
     AudioEnv = abs(hilbert(highpassfilter(double(Audio),sampRate,100)));
     AudioEnv = smooth(AudioEnv,1500); %50 ms
 %    tAudio = (0:(length(Audio)-1))/sampRate;
@@ -140,3 +146,5 @@ for ii = 1:length(rec_idx)
     MerData(rec_idx(ii)).Audio = Audio;
     MerData(rec_idx(ii)).AudioEnv = AudioEnv;
 end
+
+save([subjectName 'MerData'], 'MerData', '-v7.3');

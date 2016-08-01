@@ -1,13 +1,13 @@
 function [h, p] = clusterPermuteTtest(A, B)
 % function [h, p] = clusterPermuteTtest(data1, data2)
 % data matrices have time along the x, and trial along the y
-plotdistb = 1;
+plotdistb = 0;
 
 nrep = 1000;
 ntrials = [size(A, 1), size(B,1)];
 %mintrials = min(ntrials);
 
-[h, p, ~, stats] = ttest2(A, B, 'alpha', .025); %operates on each column
+[h, p, ~, stats] = ttest2(A, B, 'alpha', .050); %operates on each column
 clusts = bwlabel(h);
 nclust = length(unique(clusts));
 groupt = [];
@@ -15,6 +15,7 @@ for jj=1:nclust
         ts = sum([stats.tstat(clusts == jj)]);
         groupt = cat(1,groupt, ts);
 end
+groupt = abs(groupt);
 
 C = cat(1, A, B); %make a single pool of all trials to permute
 nrows = size(C,1);
@@ -36,8 +37,9 @@ for ii=1:nrep
 end
 
 tsums = tsums(tsums ~= 0); %get rid of the zeros in this vector
-sig_thresh = quantile(tsums, [.025 1-.025]);
-hgroup = (groupt <= sig_thresh(1)) | (groupt >= sig_thresh(2)); %above or below permuted significance
+tsums = abs(tsums);
+sig_thresh = quantile(tsums, .95);
+hgroup = groupt >= sig_thresh; %above or below permuted significance
 
 for ii=1:length(hgroup)
    h(clusts == ii) = hgroup(ii);
@@ -46,8 +48,9 @@ end
 
 if plotdistb && ~isempty(tsums)
     figure;
-    [f, stepx] = ecdf(tsums);
-    stairs(stepx,f, 'k'); hold on;
+    %[f, stepx] = ecdf(tsums);
+    %stairs(stepx,f, 'k'); hold on;
+    hist(tsums, 100); hold on;
     ah = gca;
     for ii=1:length(groupt)
         plot([groupt(ii), groupt(ii)], ah.YLim,'r');
