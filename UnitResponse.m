@@ -47,7 +47,7 @@ for ii = 1:nTrials
     trial(ii).IFRZ = (IFR(trialWind)-trial(ii).baselineIFR)./trial(ii).basestdIFR;
     trial(ii).baselineWindow = baseWind;
     trial(ii).stim = stim;
-    if (sum(D(EventInds((eventI-3):(eventI+1)))) >=1)
+    if (sum(D(EventInds(eventI-3):EventInds(eventI+1))) >=1)
         trial(ii).hasSpikes = true;
     else
         trial(ii).hasSpikes = false;
@@ -62,11 +62,11 @@ end
 % Compute a resampled baseline firing rate statistic that gives z-scored
 % bounds for the firing rate range outside of which a response should be
 % considered as significant. Bounds + mean could be used to z-score trials.
-iter = 500;
+iter = 1000;
 allBase = zeros(length(trial(1).baselineWindow), nTrials, iter);
 for ii=1:nTrials
     allBase(:,ii,1) = IFR(trial(ii).baselineWindow);
-    for jj=2:iter
+    parfor jj=2:iter
         allBase(:,ii,jj) = circshift(IFR(trial(ii).baselineWindow), randi(length(trial(ii).baselineWindow)));
     end
 end
@@ -74,6 +74,7 @@ allBase_mean = squeeze(mean(allBase, 2));
 alpha = .05;
 zBound  = [prctile(allBase_mean(:),alpha/2), prctile(allBase_mean(:),100*(1-alpha/2))];
 zMean = mean(allBase_mean(:));
+zStd = std(allBase_mean(:));
 %allBase = [trial.baselineIFR];
 % [f, x] = ecdf(allBase(:));
 % zlowi = find(f < .05, 1, 'last');
@@ -90,6 +91,7 @@ unit.EventInds = EventInds;
 unit.nTrials = nTrials;
 unit.zBound = zBound;
 unit.zMid = zMean;
+unit.zStd = zStd;
 
 
 

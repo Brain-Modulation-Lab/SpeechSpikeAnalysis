@@ -6,7 +6,7 @@ function [spk_h, mean_h, err_h] = plotRastersandIFRs(time, ifr_ax, ifr, ifr_err,
 % create the axes ahead of time, and provide them as arguments.
 
 spk_h = plotSpikeRasters(spk_ax, time, spikes, spk_offset);
-set(spk_h, 'Color', pcolor, 'LineWidth', 1);
+set(spk_h, 'Color', pcolor, 'LineWidth', .5);
 
 [mean_h, err_h] = plot_err_poly(ifr_ax, time, ifr, ifr_err, pcolor, (pcolor + [1 1 1])/2, .5);
 %mean_h = line('Parent', ifr_ax,'Xdata', time, 'Ydata', ifr); 

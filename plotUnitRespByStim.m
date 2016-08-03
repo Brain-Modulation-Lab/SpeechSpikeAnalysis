@@ -21,7 +21,14 @@ groups = {[1 3], [4 5]};
 % late = ~early;
 % trialFeature = late;
 % features = [0 1];
-% groups = {0, 1}
+% groups = {0, 1};
+% grouping by word/nonword
+% word = [stimMat{:,2}];
+% nonword = ~word;
+% trialFeature = word;
+% features = [0 1];
+% groups = {0, 1};
+
 kk = 1;
 
 [fh, rasterh, meanh, ~, labelh] = makeRasterIFRplot(sprintf('%s,Word List %d,%s electrode,Unit %d', subjectName, wl, electrodeList{trode}, n));
@@ -75,11 +82,11 @@ plot(rasterh, [0 0], [0 unit.nTrials], 'Color', [.7 .7 .7], 'LineWidth', 2);
 plot(meanh, [0 0], meanh.YLim, 'Color', [.7 .7 .7], 'LineWidth', 2);
 
 if ~sum(nGroupTrials == 0)
-    h = bootstrapMeanTest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1):dataRange(2,2),:), .01);
-    sig = h*(meanh.YLim(2)-1); sig(sig==0)=NaN;
-    plot(meanh, plott, sig, 'k', 'LineWidth', 3);
+%     h = bootstrapMeanTest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1):dataRange(2,2),:), .01);
+%     sig = h*(meanh.YLim(2)-1); sig(sig==0)=NaN;
+%     plot(meanh, plott, sig, 'k', 'LineWidth', 3);
 
     [h, p] = clusterPermuteTtest(ifrm(dataRange(1,1):dataRange(1,2),:), ifrm(dataRange(2,1):dataRange(2,2),:));
-    sig = h*(meanh.YLim(2)); sig(sig==0)=NaN;
+    sig = h*(meanh.YLim(2)-1); sig(sig==0)=NaN;
     plot(meanh, plott, sig, 'b', 'LineWidth', 3);
 end
