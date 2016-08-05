@@ -65,7 +65,7 @@ for ii = 1:length(rec_idx)
             spikeTimes = readSpikeTimes(spikeFN);
             %nUnits = max(unique(spikeTimes(:,1)));
             nUnits = length(unitList.(electrodeList{jj}){ii}.units);
-            V = Rec(rec_idx(ii)).Vraw.ts; % Raw waveforms
+            V = Rec(rec_idx(ii)).Vraw; % Raw waveforms
             timeFull = (0:(size(V,2)-1))/Vraw_sampRate; %timeseries
             %figure; ah = axes();
             fprintf('%s contains %d units.\n', spikeFN, nUnits);
@@ -128,8 +128,8 @@ for ii = 1:length(rec_idx)
                 
                 [fh, rasterh, meanh, ~, labelh] = makeRasterIFRplot(sprintf('%s, Unit %d', spikeFN, n));
                 plott = respWind./unit.spkSampRate;
-                %plotRastersandIFRs(plott, meanh, meanifr, stdifr, rasterh, spkm, 0, [0 0 0]);
-                plotRastersandIFRs(plott, meanh, meanifrz, stdifrz, rasterh, spkm, 0, [0 0 0]);
+                plotRastersandIFRs(plott, meanh, meanifr, stdifr, rasterh, spkm, 0, [0 0 0]);
+                %plotRastersandIFRs(plott, meanh, meanifrz, stdifrz, rasterh, spkm, 0, [0 0 0]);
                 % Test if the response is significantly different from baseline
                 [h, p] = permutationTestFromBaseline(ifrz);
                 sig = h*(meanh.YLim(2)-1); sig(sig==0)=NaN;
@@ -140,10 +140,10 @@ for ii = 1:length(rec_idx)
                 plot(meanh, [0 0], meanh.YLim, 'Color', [.4 .4 .4], 'LineWidth', 2);
                 rasterh.XLim = [plott(1) plott(end)];
                 meanh.XLim = [plott(1) plott(end)];
-                %plot(meanh, meanh.XLim, [unit.zBound(1) unit.zBound(1)], 'r');
-                %plot(meanh, meanh.XLim, [unit.zBound(2) unit.zBound(2)], 'r');
-                plot(meanh, meanh.XLim, [-3 -3], 'r');
-                plot(meanh, meanh.XLim, [3 3], 'r');
+                plot(meanh, meanh.XLim, [unit.zBound(1) unit.zBound(1)], 'r');
+                plot(meanh, meanh.XLim, [unit.zBound(2) unit.zBound(2)], 'r');
+                %plot(meanh, meanh.XLim, [-2 -2], 'r');
+                %plot(meanh, meanh.XLim, [2 2], 'r');
                 xlabel(meanh, 'Time relative to speech onset (sec)', 'FontSize', 16);
                 ylabel(meanh, 'Average Firing Rate (Hz)', 'FontSize', 16);
                 

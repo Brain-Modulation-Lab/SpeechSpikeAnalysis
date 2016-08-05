@@ -1,61 +1,3 @@
-% Analyze Subject's Units
-subjectInfo;
-%load(recFN);
-respInterval = [-2 2.5];
-MerData = struct([]);
-dbg= 1;
-
-for ii = 1:length(rec_idx)
-    
-    % Figure out task session event timing
-    EventTimes = sort([Rec(rec_idx(ii)).DigUp Rec(rec_idx(ii)).DigDown]);
-    if ii==1
-        [EventTimesTrellis] = GetEventData([dataFN '.nev']);
-    end
-    Event0 = EventTimesTrellis(find(EventTimesTrellis>cutoff_times(rec_idx(ii)),1,'first'));
-    tstart= Event0 - EventTimes(1); % This is now in trellis time
-    tend = tstart + length(Rec(rec_idx(ii)).Vraw.ts)/Vraw_sampRate;
-    SkipEvents = Rec(rec_idx(ii)).SkipEvents;
-    nTrials = 120;
-    EventTimes1 = [EventTimes EventTimes(end)+2]; % Why add an extra event here?
-    EventTimes1 = [EventTimes1 EventTimes1(end)+2]; % Why add an extra event here?
-    
-    for trial=1:nTrials
-        StimulusEvent1 = SkipEvents + 4*trial;
-        if ~isempty(Rec(rec_idx(ii)).AudioStart{trial})
-            % This is a neuroOmega time
-            ResponseTimes(trial) = EventTimes1(StimulusEvent1) + Rec(rec_idx(ii)).AudioStart{trial}/sampRate;
-        else 
-            ResponseTimes(trial) = NaN;
-        end
-    end
-    
-    % What do have/plot the audio signal too
-    if exist('dataMAT', 'var')
-        if ii==1
-            load(dataMAT{ii});
-        end
-    else
-        if ii ==1 && exist([dataFN '.ns5'])
-            [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
-        elseif ii==1
-            AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
-        end
-        Audio = AudioFull(round(tstart*sampRate):round(tend*sampRate));
-    end
-    AudioEnv = abs(hilbert(highpassfilter(double(Audio),sampRate,100)));
-    AudioEnv = smooth(AudioEnv,1500); %50 ms
-%    tAudio = (0:(length(Audio)-1))/sampRate;
-    %tAudioFull = (0:(length(AudioFull)-1))/sampRate - tstart;
-%     clear('AudioEnvTrials', 'tAudioTrials');
-%     for trial=1:length(ResponseTimes)
-%         if ~isnan(ResponseTimes(trial))
-%             audioWind = (round(sampRate*ResponseTimes(trial))-30000*respInterval(1)):(round(sampRate*ResponseTimes(trial))+sampRate*respInterval(2));
-%             AudioEnvTrials(:,trial) = AudioEnv(audioWind);
-%             tAudioTrials(:,trial) = tAudio(audioWind);
-%         end
-%     end
-    
 %% Loop through the electrodes, assemble units from each 
     for jj=1:length(electrodeList)
         spkFile = dir([subjectName '_' tasks{ii} '_' electrodeList{jj}, '*']);
@@ -120,17 +62,20 @@ for ii = 1:length(rec_idx)
                         %ifrzm(jj,zinds) = Unit.trial(jj).IFRZ(zinds);
                     end
                 end
-                
-                %meanifrz = nanmean(ifrzm); stdifrz = nanstd(ifrzm)./sqrt(Unit.nTrials);
-                basemean = unit.zMid; basestd = (unit.zBound(2)-unit.zBound(1))/6;
+                % Compute means, stds, z-scores, etc
+                basemean = unit.zMid; basestd = unit.zStd;
                 ifrz = (ifrm-basemean)/basestd;
+                meanifrz = nanmean(ifrz); stdifrz = nanstd(ifrz)./sqrt(unit.nTrials);
                 meanifr = nanmean(ifrm); stdifr = nanstd(ifrm)./sqrt(unit.nTrials);
+                
                 [fh, rasterh, meanh, ~, labelh] = makeRasterIFRplot(sprintf('%s, Unit %d', spikeFN, n));
                 plott = respWind./unit.spkSampRate;
                 plotRastersandIFRs(plott, meanh, meanifr, stdifr, rasterh, spkm, 0, [0 0 0]);
                 %plotRastersandIFRs(plott, meanh, meanifrz, stdifrz, rasterh, spkm, 0, [0 0 0]);
                 % Test if the response is significantly different from baseline
-                
+                [h, p] = permutationTestFromBaseline(ifrz);
+                sig = h*(meanh.YLim(2)-1); sig(sig==0)=NaN;
+                plot(meanh, plott, sig, 'b', 'LineWidth', 3);
                 
                 % Mark up
                 plot(rasterh, [0 0], [0 unit.nTrials], 'Color', [.4 .4 .4], 'LineWidth', 2); 
@@ -139,6 +84,8 @@ for ii = 1:length(rec_idx)
                 meanh.XLim = [plott(1) plott(end)];
                 plot(meanh, meanh.XLim, [unit.zBound(1) unit.zBound(1)], 'r');
                 plot(meanh, meanh.XLim, [unit.zBound(2) unit.zBound(2)], 'r');
+                %plot(meanh, meanh.XLim, [-2 -2], 'r');
+                %plot(meanh, meanh.XLim, [2 2], 'r');
                 xlabel(meanh, 'Time relative to speech onset (sec)', 'FontSize', 16);
                 ylabel(meanh, 'Average Firing Rate (Hz)', 'FontSize', 16);
                 
@@ -152,6 +99,3 @@ for ii = 1:length(rec_idx)
     MerData(rec_idx(ii)).Audio = Audio;
     MerData(rec_idx(ii)).AudioEnv = AudioEnv;
     %%
-end
-
-save([subjectName 'MerData'], 'MerData', '-v7.3');
