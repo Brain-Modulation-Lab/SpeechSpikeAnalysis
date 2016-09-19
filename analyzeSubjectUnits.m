@@ -1,6 +1,6 @@
 % Analyze Subject's Units
 subjectInfo;
-%load(recFN);
+load(recFN);
 respInterval = [-2 2.5];
 MerData = struct([]);
 dbg= 1;
@@ -159,4 +159,4 @@ for ii = 1:length(rec_idx)
     %%
 end
 
-save([subjectName 'MerData'], 'MerData', '-v7.3');
+%save([subjectName 'MerData'], 'MerData', '-v7.3');
