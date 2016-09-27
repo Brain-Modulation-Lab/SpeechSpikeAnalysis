@@ -66,7 +66,10 @@ for ii = 1:length(rec_idx)
             %nUnits = max(unique(spikeTimes(:,1)));
             nUnits = length(unitList.(electrodeList{jj}){ii}.units);
             V = Rec(rec_idx(ii)).Vraw; % Raw waveforms
-            timeFull = (0:(size(V,2)-1))/Vraw_sampRate; %timeseries
+            timeFull = (0:(size(V.ts,2)-1))/Vraw_sampRate; %timeseries
+            if length(timeFull)<2
+                disp('timeFull is short');
+            end
             %figure; ah = axes();
             fprintf('%s contains %d units.\n', spikeFN, nUnits);
             for n=1:nUnits
