@@ -32,7 +32,7 @@ groups = {0, 1};
 % contrastName = 'Word v Non-Word';
 % word = [stimMat{:,2}];
 % nonword = ~word;
-% trialFeature = nonword;
+% trialFeature = nonword';
 % features = [0 1];
 % groups = {0, 1};
 
