@@ -1,5 +1,5 @@
 function tonset = detectSpeechOnset(spect, t, f, baseWind, earliest)
-pb = 0;
+pb = 1;
 base = spect(:,baseWind);
 basestd = std(base,0,2);
 basemean = mean(base,2);
@@ -8,7 +8,7 @@ thresh = repmat(thresh, 1, size(spect,2));
 loud = spect > thresh;
 howloud = sum(loud);
 
-isloud = howloud > 2.5;
+isloud = howloud > 3;
 loudlabel = bwlabel(isloud);
 tthresh = 10;
 onseti = -1;
@@ -27,6 +27,7 @@ if onseti ~= -1
         pcolor(t, f, spect); shading flat;
         ah = gca;
         hold on; plot([t(tonset) t(tonset)], ah.YLim, 'k');
+        colormap('jet');
     end
 else
     disp('Nothing detected');

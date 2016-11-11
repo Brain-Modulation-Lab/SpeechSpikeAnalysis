@@ -12,9 +12,9 @@ for wl = 1:length(rec_idx)
             trode = jj;
             plotUnitRespByStim;
             
-            fn = sprintf('%s_WL%d_%s_unit%d%s', subjectName, wl, electrodeList{trode}, n, 'EarlyLate');
+            fn = sprintf('%s_WL%d_%s_unit%d%s', subjectName, wl, electrodeList{trode}, n, 'C2LipsTongue');
             fh.Renderer = 'painters';
-            saveas(fh, fn,'epsc');
+            %saveas(fh, fn,'epsc');
         end
     end
 end

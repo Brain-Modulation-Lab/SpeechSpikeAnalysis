@@ -74,6 +74,7 @@ fprintf('Rec %d.\n', rec_idx(ii));
             nUnits = length(unitList.(electrodeList{jj}){ii}.units);
             V = Rec(rec_idx(ii)).Vraw; % Raw waveforms
             timeFull = (0:(size(V.ts,2)-1))/Vraw_sampRate; %timeseries
+            %timeFull = (0:(size(V,2)-1))/Vraw_sampRate; %timeseries
             if length(timeFull)<2
                 disp('timeFull is short');
             end
