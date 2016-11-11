@@ -8,7 +8,7 @@ thresh = repmat(thresh, 1, size(spect,2));
 loud = spect > thresh;
 howloud = sum(loud);
 
-isloud = howloud > 5;
+isloud = howloud > 2.5;
 loudlabel = bwlabel(isloud);
 tthresh = 10;
 onseti = -1;
