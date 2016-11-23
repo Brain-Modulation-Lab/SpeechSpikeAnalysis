@@ -36,11 +36,11 @@ for ii = 1:length(rec_idx)
             load(dataMAT{ii});
         end
     else
-%         if ii ==1 && exist([dataFN '.ns5'])
-%             [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
-%         elseif ii==1
-%             AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
-%         end
+        if ii ==1 && exist([dataFN '.ns5'])
+            [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
+        elseif ii==1
+            AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
+        end
         if length(AudioFull)>=round(tend*sampRate)
             Audio = AudioFull(round(tstart*sampRate):round(tend*sampRate));
         else
