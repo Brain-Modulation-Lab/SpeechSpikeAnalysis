@@ -36,11 +36,11 @@ for ii = 1:length(rec_idx)
             load(dataMAT{ii});
         end
     else
-        if ii ==1 && exist([dataFN '.ns5'])
-            [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
-        elseif ii==1
-            AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
-        end
+%         if ii ==1 && exist([dataFN '.ns5'])
+%             [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
+%         elseif ii==1
+%             AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
+%         end
         if length(AudioFull)>=round(tend*sampRate)
             Audio = AudioFull(round(tstart*sampRate):round(tend*sampRate));
         else
@@ -107,13 +107,14 @@ fprintf('Rec %d.\n', rec_idx(ii));
                 ifrm = NaN*zeros(size(ifrzm));
                 zi = find(respWind == 0);
                 for kk = 1:unit.nTrials
-                    if ~isempty(Rec(rec_idx(ii)).AudioStart{kk})
-                        audioInd = unit.trial(kk).EventInds(4) + round(Rec(rec_idx(ii)).AudioStart{kk}/sampRate*unit.spkSampRate);
+                    tnum = unit.trial(kk).stim;
+                    if ~isempty(Rec(rec_idx(ii)).AudioStart{tnum})
+                        audioInd = unit.trial(kk).EventInds(4) + round(Rec(rec_idx(ii)).AudioStart{tnum}/sampRate*unit.spkSampRate);
                         offset = unit.trial(kk).EventInds(1);
                         trial_inds = audioInd+respWind-offset;
                         if(trial_inds(1) < 1)
                             fprintf('%f time between trial start and cue\n', (unit.trial(kk).EventInds(4)-unit.trial(kk).EventInds(1))/unit.spkSampRate);
-                            fprintf('%f Audio latency\n', Rec(rec_idx(ii)).AudioStart{kk}/sampRate);
+                            fprintf('%f Audio latency\n', Rec(rec_idx(ii)).AudioStart{tnum}/sampRate);
                             disp('Trial indices are negative');             
                         end
                         ifrm(kk,:) = unit.IFR(audioInd+respWind);
