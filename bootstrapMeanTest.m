@@ -12,7 +12,7 @@ function [h] = bootstrapMeanTest(data1, data2, alpha)
 
 %meandiff = @(x, y)nanmean(x,1)-nanmean(y,1);
 %diffCI = bootci(2000, {@bootMeanDiff, data1, data2}, 'type', 'cper','Options', statset('UseParallel',true), 'alpha', alpha);
-nresamp = 1000;
+nresamp = 5000;
 [bootstat, ~] = bootstrp(nresamp, @nanmean, data1, 'Options', statset('UseParallel',true));
 [bootstat2, ~] = bootstrp(nresamp, @nanmean, data2, 'Options', statset('UseParallel',true));
 d = bootstat - bootstat2;
