@@ -1,4 +1,4 @@
-function [h] = bootstrapMeanTest(data1, data2, alpha)
+function [h, p] = bootstrapMeanTest(data1, data2, alpha)
 % function [h] = bootstrapMeanTest(data1, data2, alpha)
 %
 % Test for a difference in means of the two data sets
@@ -19,6 +19,7 @@ d = bootstat - bootstat2;
 CI = quantile(d, [alpha/2 1-alpha/2], 1);
 meand = nanmean(d);
 h = CI(1,:) > 0 | CI(2,:) < 0;
+p = [1-sum(d>0)./length(d) 1-sum(d<0)./length(d)];
 meandiff = nanmean(data1) - nanmean(data2);
 
 % Get p-values for FDR correction
