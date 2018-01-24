@@ -1,7 +1,7 @@
 function [h, p] = clusterPermuteTtest(A, B)
 % function [h, p] = clusterPermuteTtest(data1, data2)
 % data matrices have time along the x, and trial along the y
-plotdistb = 0;
+plotdistb = 1;
 
 nrep = 1000;
 ntrials = [size(A, 1), size(B,1)];
