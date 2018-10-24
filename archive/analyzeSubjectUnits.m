@@ -1,6 +1,6 @@
 % Analyze Subject's Units
-subjectInfo;
-load(recFN);
+BA080416subjectInfo;
+%load(recFN);
 respInterval = [-2 2.5];
 MerData = struct([]);
 dbg= 1;
@@ -14,7 +14,7 @@ for ii = 1:length(rec_idx)
     end
     Event0 = EventTimesTrellis(find(EventTimesTrellis>cutoff_times(rec_idx(ii)),1,'first'));
     tstart= Event0 - EventTimes(1); % This is now in trellis time
-    tend = tstart + length(Rec(rec_idx(ii)).Vraw.ts)/Vraw_sampRate;
+    tend = tstart + length(Rec(rec_idx(ii)).Raw.ts)/Vraw_sampRate;
     SkipEvents = Rec(rec_idx(ii)).SkipEvents;
     nTrials = floor((length(EventTimes)-SkipEvents)/4);
     EventTimes1 = [EventTimes EventTimes(end)+2]; % Why add an extra event here?
@@ -30,23 +30,23 @@ for ii = 1:length(rec_idx)
         end
     end
     
-    % What do have/plot the audio signal too
-    if exist('dataMAT', 'var')
-        if ii==1
-            load(dataMAT{ii});
-        end
-    else
-        if ii ==1 && exist([dataFN '.ns5'])
-            [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
-        elseif ii==1
-            AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
-        end
-        if length(AudioFull)>=round(tend*sampRate)
-            Audio = AudioFull(round(tstart*sampRate):round(tend*sampRate));
-        else
-            Audio = cat(1,AudioFull(round(tstart*sampRate):end),zeros(round(tend*sampRate)-length(AudioFull),1));
-        end
-    end
+%     % What do have/plot the audio signal too
+%     if exist('dataMAT', 'var')
+%         if ii==1
+%             load(dataMAT{ii});
+%         end
+%     else
+%         if ii ==1 && exist([dataFN '.ns5'])
+%             [~, AudioFull, AnalogElectrodeIDs] = GetAnalogData([dataFN '.ns5'], sampRate, 10269, [], []);
+%         elseif ii==1
+%             AudioFull = NaN*zeros(round((EventTimesTrellis(end)-EventTimesTrellis(1))*sampRate),1);
+%         end
+%         if length(AudioFull)>=round(tend*sampRate)
+%             Audio = AudioFull(round(tstart*sampRate):round(tend*sampRate));
+%         else
+%             Audio = cat(1,AudioFull(round(tstart*sampRate):end),zeros(round(tend*sampRate)-length(AudioFull),1));
+%         end
+%     end
 %     AudioEnv = abs(hilbert(highpassfilter(double(Audio),sampRate,100)));
 %     AudioEnv = smooth(AudioEnv,1500); %50 ms
 %    tAudio = (0:(length(Audio)-1))/sampRate;
@@ -166,7 +166,7 @@ fprintf('Rec %d.\n', rec_idx(ii));
     end
     MerData(rec_idx(ii)).EventTimes = EventTimes1;
     MerData(rec_idx(ii)).ResponseTimes = ResponseTimes;
-    MerData(rec_idx(ii)).Audio = Audio;
+    MerData(rec_idx(ii)).Audio = [];%Audio;
     MerData(rec_idx(ii)).AudioEnv = [];%AudioEnv;
     %%
 end
