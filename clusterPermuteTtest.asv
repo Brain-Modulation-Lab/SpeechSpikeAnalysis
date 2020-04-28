@@ -1,18 +1,24 @@
-function [h, p] = clusterPermuteTtest(A, B)
+function [h, p] = clusterPermuteTtest(A, B, varargin)
 % function [h, p] = clusterPermuteTtest(data1, data2)
 % data matrices have time along the x, and trial along the y
-plotdistb = 1;
+plotdistb = 0;
 
+if isempty(varargin)
+    alphathresh = 0.05;
+else
+    alphathresh = varargin{1};
+end
+    
 nrep = 1000;
 ntrials = [size(A, 1), size(B,1)];
 %mintrials = min(ntrials);
 
-[h, p, ~, stats] = ttest2(A, B, 'alpha', .050); %operates on each column
+[h, p, ~, stats] = ttest2(A, B, 'alpha', alphathresh); %operates on each column
 clusts = bwlabel(h);
-nclust = length(unique(clusts));
-groupt = [];
+nclust = length(unique(clusts))-1;
+groupt = []; ts=[];
 for jj=1:nclust
-        ts = sum([stats.tstat(clusts == jj)]);
+        ts = sum([stats.tstat(clusts == (jj+1))]);
         groupt = cat(1,groupt, ts);
 end
 groupt = abs(groupt);
@@ -27,18 +33,24 @@ for ii=1:nrep
     bi = order((ntrials(1)+1):nrows);
     B1 = C(bi, :);
     
-    [h1, ~, ~, stat1] = ttest2(A1,B1, 'alpha', .025);
+    [h1, ~, ~, stat1] = ttest2(A1,B1, 'alpha', alphathresh);
     clust1 = bwlabel(h1);
-    nclust = length(unique(clust1));
+    nclust = length(unique(clust1))-1;
     for jj=1:nclust
-        ts = sum([stat1.tstat(clust1 == jj)]);
-        tsums = cat(1,tsums, ts);
+        ts(jj) = sum([stat1.tstat(clust1 == (jj+1))]);
+        %tsums = cat(1,tsums, ts);
     end
+    tsums = cat(1,tsums, max(abs(ts)));
+    clear ts;
 end
 
 tsums = tsums(tsums ~= 0 & ~isnan(tsums)); %get rid of the zeros in this vector
 tsums = abs(tsums);
-sig_thresh = quantile(tsums, .95);
+if ~isempty(tsums)
+    sig_thresh = quantile(tsums, .95);
+else
+    tsums = 1;
+end
 hgroup = groupt >= sig_thresh; %above or below permuted significance
 
 for ii=1:length(hgroup)
